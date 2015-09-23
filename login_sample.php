@@ -1,5 +1,9 @@
 <?php
 
+	require_once("../config.php");
+	$database = "if15_hendval";
+	$mysqli = new mysqli($servername, $username, $password, $database);
+
   // muuutujad errorite jaoks
 	$email_error = "";
 	$password_error = "";
@@ -36,6 +40,9 @@
       // Kui oleme siia jõudnud, võime kasutaja sisse logida
 			if($password_error == "" && $email_error == ""){
 				echo "Võib sisse logida! Kasutajanimi on ".$email." ja parool on ".$password;
+				
+				
+				
 			}
 
 		} // login if end
@@ -62,7 +69,14 @@
 			}
 
 			if(	$create_email_error == "" && $create_password_error == ""){
-				echo "Võib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password;
+				
+				$hash = hash("sha512", $create_password);
+				
+				$stmt = $mysqli->prepare("INSERT INTO user_sample (email, password) VALUES (?,?)");
+				// ss - s on string email, s on string password
+				$stmt->bind_param("ss", $create_email, $hash);
+				$stmt->execute();
+				$stmt->close();
       }
 
     } // create if end
@@ -77,6 +91,8 @@
   	return $data;
   }
 
+  //paneme ühenduse kinni
+  $mysqli->close();
 ?>
 <!DOCTYPE html>
 <html>
